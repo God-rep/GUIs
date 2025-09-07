@@ -141,7 +141,7 @@ int main(int argc, char* args[]){
 		}
 	
 		//Checa estado do array
-		printf("inicioArray:%d | fimArray:%d\n", inicioPlatArray, fimPlatArray);
+		// printf("inicioArray:%d | fimArray:%d\n", inicioPlatArray, fimPlatArray);
 		SDL_RenderPresent(ren);
 
 		/* Lida com tempo */
