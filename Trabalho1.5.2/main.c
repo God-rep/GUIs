@@ -3,11 +3,6 @@
 
 int AUX_WaitEventTimeoutCount (SDL_Event* evt, Uint32* ms);
 
-
-
-int espera = 500;	// Tempo de espera base como global
-			// Nao precisa ser passado para a funcao auxiliar
-
 int main (int argc, char* args[])
 {
     /* INICIALIZACAO */
@@ -24,6 +19,7 @@ int main (int argc, char* args[])
     SDL_Rect r2 = { 50,20, 10,10 };
     SDL_Rect r3 = { 60,20, 10,10 };
 
+    int espera = 500;
     SDL_Event evt;
 
    while (1) {
@@ -51,9 +47,7 @@ int main (int argc, char* args[])
 	SDL_RenderPresent(ren);
 
 	//Lida com tempo
-        Uint32 antes = SDL_GetTicks();
-	
-	int isevt = AUX_WaitEventTimeoutCount (&evt, &antes);
+	int isevt = AUX_WaitEventTimeoutCount (&evt, &espera);
 
 	if(isevt){	//Houve evento nao-temporal?
 
@@ -102,6 +96,9 @@ int main (int argc, char* args[])
 	}
 	else{	//Tratamento de evento temporal
 
+		//Reinicia espera
+		espera = 500;
+
 		//Move retangulo guiado por tempo
 		r2.x +=1;
 		r2.y +=1;
@@ -119,16 +116,22 @@ FIM:
 
 
 
+
 //Funcao auxiliar que esconde o uso de "SDL_WaitEventTimeout"
-int AUX_WaitEventTimeoutCount (SDL_Event* evt, Uint32* ms){
+//
+//
+//Atualizada -> Agora nao precisa de getTicks() anterior a chamada,
+//mas nao redefine valor de espera automaticamente (poderia ser feito com a adicao de mais uma variavel,
+//ou utilizando a versao anterior)
+int AUX_WaitEventTimeoutCount(SDL_Event* evt, Uint32* ms){
 
-	int isevt =  SDL_WaitEventTimeout( evt , espera );
+        //Pega tempo anterior
+        Uint32 antes = SDL_GetTicks();
 
-	//Lida com atualizacao da global
-	espera = (isevt)? (espera-( SDL_GetTicks()- (*ms) ) ) :500;
+        int isevt =  SDL_WaitEventTimeout( evt , *ms );
 
+        //Lida com atualizacao do valor de espera
+        (*ms) = (isevt)? ((*ms)-( SDL_GetTicks()- antes )):(*ms);
 
-	return isevt;
+        return isevt;
 }
-
-
