@@ -33,8 +33,6 @@ int destroiPlataforma(plataforma** array, int* inicio, int* fim); // Destroi pla
                                                 		  // 1 -> criada com sucesso. 0 -> Erro
 
 
-int espera = 100;
-
 
 int main(int argc, char* args[]){
 	
@@ -62,6 +60,7 @@ int main(int argc, char* args[]){
 
 	int contaTick = 49; // Varia de 0 a 999 e reseta. Comeca em 49 para acelerar criacao de plataformas iniciais
 
+	Uint32 espera = 100;
 	SDL_Event evt;
 	
 	// Armazena ponteiros para plataformas serem alocadas na heap
@@ -145,9 +144,7 @@ int main(int argc, char* args[]){
 		SDL_RenderPresent(ren);
 
 		/* Lida com tempo */
-		Uint32 antes = SDL_GetTicks();
-
-		int isevt = AUX_WaitEventTimeoutCount(&evt, &antes);
+		int isevt = AUX_WaitEventTimeoutCount(&evt, &espera);
 
 		/* Execucao */
 		if(isevt){	// Se houver evento nao-temporal no intervalo
@@ -199,6 +196,7 @@ int main(int argc, char* args[]){
 			int xWin = -1;
 			int yWin = -1;
 		
+			espera = 100;
 			contaTick = ((contaTick+1)%1000);
 
 			/* relacionado a gravidade agindo no jogador (bola vermelha) */
@@ -330,14 +328,20 @@ int destroiPlataforma(plataforma** array, int* inicio, int* fim){
 
 //Funcao auxiliar que esconde o uso de "SDL_WaitEventTimeout"
 //Reutilizada de 1.5.2
+//
+//
+//Atualizada -> Agora nao precisa de getTicks() anterior a chamada,
+//mas nao redefine valor de espera automaticamente (poderia ser feito com a adicao de mais uma variavel,
+//ou utilizando a versao anterior)
 int AUX_WaitEventTimeoutCount(SDL_Event* evt, Uint32* ms){
 
-        int isevt =  SDL_WaitEventTimeout( evt , espera );
+        //Pega tempo anterior
+        Uint32 antes = SDL_GetTicks();
 
-        //Lida com atualizacao da global
-        espera = (isevt)? (espera-( SDL_GetTicks()- (*ms) ) ) :100;
+        int isevt =  SDL_WaitEventTimeout( evt , *ms );
 
+        //Lida com atualizacao do valor de espera
+        (*ms) = (isevt)? ((*ms)-( SDL_GetTicks()- antes )):(*ms);
 
         return isevt;
 }
-
