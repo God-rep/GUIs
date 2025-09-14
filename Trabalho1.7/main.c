@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <errno.h>
-
+#include <stdlib.h>
 
 #include <stdio.h>
 
@@ -261,8 +261,12 @@ int main(int argc, char* args[]){
 
 			/* relacionado a gravidade agindo no jogador (bola vermelha) */
 			SDL_GetWindowSize(win, &xWin, &yWin);
+
 			if(ticksSubindo>0){
-				r.y -= 5;
+				r.y -=5;
+				if (r.y <0){
+					r.y = yWin;
+				}
 				ticksSubindo -=1;
 			}
 
@@ -273,11 +277,10 @@ int main(int argc, char* args[]){
                 	}
 			*/
 
-			// Correcao para imagem
-			else{ // Fundo da imagem < altura da janela
-                                r.y = (r.y+5) % yWin;
-                        }
-
+			// Correcao de movimento para imagem
+			else{
+	                        r.y = (r.y+5) % yWin;
+			}
 
 			int i = inicioPlatArray;
 			while(i != fimPlatArray){
