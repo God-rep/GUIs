@@ -43,7 +43,7 @@ int main(int argc, char* args[]){
 	
 	IMG_Init(0);	// Inicializa img
 	
-	SDL_Window* win = SDL_CreateWindow("Plataformas alinhadas",
+	SDL_Window* win = SDL_CreateWindow("Foto Plataforma",
                          SDL_WINDOWPOS_UNDEFINED,
                          SDL_WINDOWPOS_UNDEFINED,
                          700, 600, SDL_WINDOW_SHOWN
@@ -64,9 +64,13 @@ int main(int argc, char* args[]){
 	filledCircleRGBA(ren, r.x, r.y, 10, 0xFF, 0xFF, 0xFF, 0xFF);
 	*/
 
+
 	// Nova imagem
-	SDL_Rect r = {300, 564, 50, 36};
-	SDL_RenderCopy(ren, img, NULL, &r);
+	SDL_Rect r = {300, 564, 50, 36};	// pos inicial
+	//SDL_RenderCopy(ren, img, NULL, &r);	// carrega imagem no retangulo
+
+	// Retangulo de animacao da imagem
+	SDL_Rect jp;
 
 	int ticksSubindo = 0; // Diz quantos ticks o jogador continuara pulando (se >0) ou se nao esta pulando no momento (se =0)
 
@@ -143,9 +147,20 @@ int main(int argc, char* args[]){
 	        SDL_RenderClear(ren);
 
 
-		//Jogador
+		//Jogador -> bola
 		//filledCircleRGBA(ren, r.x, r.y, 10, 0xFF, 0x00, 0x00, 0xFF);
-		SDL_RenderCopy(ren, img, NULL, &r);
+
+		//Jogador -> imagem imovel
+		//SDL_RenderCopy(ren, img, NULL, &r);
+
+		//Jogador  -> imagem animada
+		if(ticksSubindo){
+			jp = (SDL_Rect) {0, 0, 50, 36};
+		}
+		else{
+			jp = (SDL_Rect) {0, 5, 50, 36};	
+		}
+		SDL_RenderCopy(ren, img, &jp, &r);
 
 		//Plataformas
 		int z = inicioPlatArray;
@@ -259,8 +274,8 @@ int main(int argc, char* args[]){
 			*/
 
 			// Correcao para imagem
-			else if((r.y+r.h) < yWin){ // Fundo da imagem < altura da janela
-                                r.y +=5;
+			else{ // Fundo da imagem < altura da janela
+                                r.y = (r.y+5) % yWin;
                         }
 
 
